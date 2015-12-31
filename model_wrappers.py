@@ -10,18 +10,20 @@ class XgboostModel:
 
     def __init__(self, model_params, train_params=None, test_params=None):
         self.model_params = model_params
-        self.train_params = train_params
+        if train_params:
+            self.train_params = train_params
+        else:
+            self.train_params = {"num_boost_round": 300 }
         self.test_params = test_params
         fname_parts = ['xgb']
-        fname_parts.extend(['{0}{1}'.format(key, val) for key,val in model_params.iteritems()])
-        self.model_out_fname = '_'.join(fname_parts)
+        fname_parts.extend(['{0}#{1}'.format(key, val) for key,val in model_params.iteritems()])
+        self.model_out_fname = '-'.join(fname_parts)
 
     def fit(self, X, y):
         """Fit model."""
-        dtrain = xgb.DMatrix(self.X, self.y)
+        dtrain = xgb.DMatrix(X, label=np.asarray(y))
         bst, loss, ntree = xgb.train(self.model_params, dtrain,
-                  num_boost_round=self.train_params['num_boost_round'],
-                  evals=self.train_params['evals'])
+                  num_boost_round=self.train_params['num_boost_round'])
         self.bst = bst
         self.loss = loss
         self.ntree = ntree
