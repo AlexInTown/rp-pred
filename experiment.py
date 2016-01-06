@@ -75,7 +75,6 @@ class ExperimentL1:
             scores.append(score)
             i += 1
         scores = np.asarray(scores)
-        print scores.mean(), scores.std()
         return scores, preds
 
 
